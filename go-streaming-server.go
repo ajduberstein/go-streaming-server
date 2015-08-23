@@ -6,7 +6,6 @@ import (
 	"net"
 	"os"
 	"strconv"
-	"strings"
 	"time"
 )
 
@@ -18,39 +17,39 @@ type EpochRecord struct {
 func main() {
 	/*
 		Example file input format:
+
 		epoch,payload
 		1440358702,"{ ""device_id"": 1, ""capacity"": 10 }"
 		...
 
 		Example use:
-
+		go-streaming-server example.csv 1440358701
 	*/
 	fmt.Println("Launching server...")
 	ln, _ := net.Listen("tcp", ":8081")
 	fileName := os.Args[1]
 	timerStart, _ := strconv.ParseInt(os.Args[2], 10, 64)
-	conn, _ := ln.Accept()
+	timerEnd, _ := strconv.ParseInt(os.Args[3], 10, 64)
 	//Initial state
-	timer := timerStart
-	var playbackData map[int64]string
-	f := strings.NewReader(fileName)
-	r := csv.NewReader(f)
-
+	playbackData := make(map[int64]string)
+	file, _ := os.Open(fileName)
+	defer file.Close()
+	r := csv.NewReader(file)
+	rows, _ := r.ReadAll()
+	conn, _ := ln.Accept()
 	//Create list
-	for {
-		if parts, err := r.Read(); err == nil {
-			epoch, _ := strconv.ParseInt(parts[0], 10, 64)
-			cs := EpochRecord{epoch, parts[1]}
-			playbackData[cs.epoch] = cs.payload
-		} else {
-			break
-		}
+	for i := 0; i < len(rows); i++ {
+		row := rows[i]
+		epoch, _ := strconv.ParseInt(row[0], 10, 64)
+		cs := EpochRecord{epoch, row[1]}
+		playbackData[cs.epoch] = cs.payload
 	}
-
-	for {
-		timer += 1
-		newMessage := playbackData[timer] + "\n"
+	for t := timerStart; ; t++ {
+		newMessage := playbackData[t] + "\n"
 		time.Sleep(1000 * time.Millisecond)
 		conn.Write([]byte(newMessage))
+		if t > timerEnd {
+			t = timerStart
+		}
 	}
 }
