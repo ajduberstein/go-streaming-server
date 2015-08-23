@@ -1,0 +1,9 @@
+epoch,payload
+1440358701,"{ ""device_id"": 1, ""capacity"": 1 } }"
+1440358702,"{ ""device_id"": 2, ""capacity"": 8 } }"
+1440358702,"{ ""device_id"": 1, ""capacity"": 7 } }"
+1440358704,"{ ""device_id"": 1, ""capacity"": 9 } }"
+1440358706,"{ ""device_id"": 1, ""capacity"": 9 } }"
+1440358707,"{ ""device_id"": 3, ""capacity"": 8 } }"
+1440358708,"{ ""device_id"": 1, ""capacity"": 6 } }"
+1440358714,"{ ""device_id"": 2, ""capacity"": 5 } }"
